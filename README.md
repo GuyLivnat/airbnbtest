@@ -1,5 +1,5 @@
-# airbnbtest
-test for qa interview
+# Airbnbtest
+Automation test for Interview
 
 Here are the steps to run the program:
 1. Download and install Python
