@@ -1,4 +1,5 @@
-from typing import List
+import time
+from typing import List, Tuple
 from playwright.sync_api import Locator
 from .base_page import BasePage
 
@@ -9,6 +10,10 @@ class SearchResultsPage(BasePage):
     TITLE = 'div[data-testid="listing-card-title"]'
     NAME = 'span[data-testid="listing-card-name"]'
     NEXT_BUTTON = 'a[aria-label="Next"]'
+    SEARCH_DATE = 'button[data-testid="little-search-anytime"]'
+    SEARCH_LOCATION = 'button[data-testid="little-search-location"]'
+    SEARCH_COUNT = 'button[data-testid="little-search-guests"]'
+
 
     def wait_for_listings(self, timeout: int = 10000):
         # ensure at least one card appears
@@ -17,10 +22,6 @@ class SearchResultsPage(BasePage):
     def get_all_listings(self) -> List[Locator]:
         self.wait_for_listings()
         return self.locator(self.CARD).all()
-
-    def get_first_listing(self) -> Locator:
-        self.wait_for_listings()
-        return self.locator(self.CARD).first
 
     def click_next_page(self) -> bool:
         next_btn = self.page.query_selector(self.NEXT_BUTTON)
@@ -55,3 +56,10 @@ class SearchResultsPage(BasePage):
 
     def get_name(self, card: Locator) -> str:
         return card.locator(self.NAME).inner_text().strip()
+
+    def get_current_search_settings(self) -> Tuple[str, str, str]:
+        time.sleep(1)
+        location = (self.locator(f"{self.SEARCH_LOCATION} div").inner_text())
+        date = (self.locator(f"{self.SEARCH_DATE} div").inner_text())
+        guest_count = (self.locator(f"{self.SEARCH_COUNT} div").first.inner_text())
+        return location, date, guest_count

@@ -2,6 +2,7 @@
 Automation test for Interview
 
 Here are the steps to run the program:
+NOTE: please use a shell that is both an admin and supports UTF-8 encoding
 1. Download and install Python
 2. Navigate to your desired local directory
 3. Clone this repository: (admin shell) git clone https://github.com/GuyLivnat/airbnbtest.git

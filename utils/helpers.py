@@ -1,5 +1,18 @@
+from datetime import date, timedelta
+from typing import Tuple
+
 from pages.search_results_page import SearchResultsPage
 
+
+def get_nearest_weekend() -> Tuple[date, date]:
+    # Calculate nearest Thursday and Saturday
+    today = date.today()
+    thursday_offset = (3 - today.weekday() + 7) % 7 or 7
+    saturday_offset = (5 - today.weekday() + 7) % 7 or 7
+    thursday = (today + timedelta(days=thursday_offset))
+    saturday = (today + timedelta(days=saturday_offset))
+
+    return thursday, saturday
 
 def get_cheapest_entry(data: dict[str, list]) -> dict[str, any]:
     prices = data["price"]
