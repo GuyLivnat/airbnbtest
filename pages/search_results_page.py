@@ -7,15 +7,15 @@ class SearchResultsPage(BasePage):
     FILTER_DEST = 'button[aria-label*="location"]'
     FILTER_DATES = 'button[aria-label*="dates"]'
     FILTER_GUESTS = 'button[aria-label*="guests"]'
-    CARD = 'div[data-testid="card-container"]'  # updated selector
+    CARD = 'div[data-testid="card-container"]'
     RATING = '[aria-label$="rating"]'
-    PRICE = 'span[data-testid="price"]'
-    TITLE = 'div[role="heading"]'
+    PRICE = 'div[data-testid="price-availability-row"]'
+    TITLE = 'div[data-testid="listing-card-title"]'
+    NAME = 'span[data-testid="listing-card-name"]'
 
     def wait_for_listings(self, timeout: int = 10000):
-        self.page.wait_for_load_state("networkidle", timeout=timeout)
         # ensure at least one card appears
-        self.locator(self.CARD).first.wait_for(state="visible", timeout=timeout)
+        self.page.wait_for_selector(self.CARD, timeout=timeout)
 
     def get_all_listings(self) -> List[Locator]:
         self.wait_for_listings()
@@ -35,12 +35,21 @@ class SearchResultsPage(BasePage):
         return self.get_text(self.FILTER_GUESTS)
 
     def get_rating(self, card: Locator) -> float:
-        text = card.locator(self.RATING).inner_text().split()[0]
+        deepest = card.locator(
+            "xpath=./div[last()]/div[last()]/div[last()]"
+        )
+        text = deepest.locator("span").first.inner_text()[:2]
+
         return float(text)
 
-    def get_price(self, card: Locator) -> float:
-        text = card.locator(self.PRICE).inner_text().split()[0]
-        return float(text)
+    def get_price(self, card: Locator) -> int:
+        text = (card.locator(self.PRICE).locator('button').locator('span').first.inner_text())
+        for string in ['\u20aa', ' ', ',', 'total']:
+            text = text.replace(string, '')
+        return int(text)
 
     def get_title(self, card: Locator) -> str:
         return card.locator(self.TITLE).inner_text().strip()
+
+    def get_name(self, card: Locator) -> str:
+        return card.locator(self.NAME).inner_text().strip()
