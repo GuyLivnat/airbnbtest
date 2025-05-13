@@ -9,3 +9,4 @@ NOTE: please use a shell that is both an admin and supports UTF-8 encoding
 4. Enter the cloned repo: (admin shell) cd airbnbtest
 5. Install dependencies: (admin shell) pip install -r requirements.txt
 6. Install playwright: (admin shell) playwright install
+7. Run the program: (shell) pytest -q -s

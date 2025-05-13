@@ -1,3 +1,4 @@
+from pages.confirmation_page import ConfirmationPage
 from pages.home_page import HomePage
 from pages.room_page import RoomPage
 from pages.search_results_page import SearchResultsPage
@@ -43,6 +44,7 @@ def test_case_2(page):
 
     room = RoomPage(page)
 
+    # Reservation details
     info = room.get_info()
     print(f"Here are the details for the top rated airbnb in '{search_address}':\n"
           f"The cost is {info["price_per_night"]}\n"
@@ -50,7 +52,23 @@ def test_case_2(page):
           f"Check out is on {info["checkout"]}\n"
           f"A total of {info["guest_count"]} will be attending\n"
           f"The sum of the nightly costs is {info["sum_nightly_fee"]}\n"
-          f"There is an additional cleaning fee of {info["cleaning_fee"]}\n"
-          f"For a sum total of {info["total_fee"]}\n")
+          f"There is an additional fee of {info["cleaning_fee"]}\n"
+          f"The sum total cost is {info["total_fee"]}\n")
 
+    # Attempt reservation
+    room.confirm()
+
+    conf = ConfirmationPage(page)
+    f_count = conf.get_guest_count()
+    f_date = conf.get_dates()
+    f_date = f_date.split()
+
+    #
+    assert str(guest_count) in f_count
+    assert f_date[1] == checkin_date.strftime("%b")
+    assert f_date[2] == checkin_date.strftime("%d")
+    assert f_date[4] == checkout_date.strftime("%d")
+    conf.choose_country("972IL")
+    conf.input_phone_number(80815808)
+    page.pause()
 

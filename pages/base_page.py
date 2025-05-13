@@ -2,7 +2,6 @@ from playwright.sync_api import Page, Locator
 
 
 class BasePage:
-    TIMEOUT = 10000
 
     def __init__(self, page: Page, base_url: str = "https://www.airbnb.com"):
         self.page = page
@@ -12,11 +11,11 @@ class BasePage:
         url = path if path.startswith("http") else f"{self.base_url}{path}"
         self.page.goto(url)
 
-    def click(self, selector: str, timeout: int = TIMEOUT):
+    def click(self, selector: str, timeout: int = 10000):
         self.page.wait_for_selector(selector, state="visible", timeout=timeout)
         self.page.click(selector)
 
-    def fill(self, selector: str, text: str, timeout: int = TIMEOUT):
+    def fill(self, selector: str, text: str, timeout: int = 10000):
         self.page.wait_for_selector(selector, state="visible", timeout=timeout)
         self.page.fill(selector, text)
 

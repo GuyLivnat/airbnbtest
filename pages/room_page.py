@@ -13,6 +13,7 @@ class RoomPage(BasePage):
     CHECKIN = 'div[data-testid="change-dates-checkIn"]'
     CHECKOUT = 'div[data-testid="change-dates-checkOut"]'
     COUNT = 'div[id="GuestPicker-book_it-trigger"]'
+    CONFIRM_BUTTON = 'button[data-testid="homes-pdp-cta-btn"]'
 
     def get_info(self) -> dict:
         ppn = (self.locator(self.BOOK_INFO).locator("xpath=.//span[contains(text(), 'per night')]").first.inner_text())
@@ -37,3 +38,7 @@ class RoomPage(BasePage):
             "cleaning_fee": cleaning_fee,
             "total_fee": total_fee,
         })
+
+    def confirm(self):
+        button = self.locator(self.CONFIRM_BUTTON).last
+        button.click()
