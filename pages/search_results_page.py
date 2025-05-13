@@ -58,8 +58,20 @@ class SearchResultsPage(BasePage):
         return card.locator(self.NAME).inner_text().strip()
 
     def get_current_search_settings(self) -> Tuple[str, str, str]:
-        time.sleep(1)
+        self.wait_for_search_parameters(f"{self.SEARCH_LOCATION} div")
         location = (self.locator(f"{self.SEARCH_LOCATION} div").inner_text())
         date = (self.locator(f"{self.SEARCH_DATE} div").inner_text())
         guest_count = (self.locator(f"{self.SEARCH_COUNT} div").first.inner_text())
         return location, date, guest_count
+
+    def wait_for_search_parameters(self, selector: str, timeout: int = 3, poll_interval: float = 0.1) -> None:
+        end_time = time.time() + timeout
+
+        while time.time() < end_time:
+            text = self.get_text(selector)
+            if text:
+                return
+            time.sleep(poll_interval)
+
+        raise TimeoutError
+
