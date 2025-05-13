@@ -16,7 +16,6 @@ class SearchResultsPage(BasePage):
 
 
     def wait_for_listings(self, timeout: int = 10000):
-        # ensure at least one card appears
         self.page.wait_for_selector(self.CARD, timeout=timeout)
 
     def get_all_listings(self) -> List[Locator]:
@@ -57,6 +56,10 @@ class SearchResultsPage(BasePage):
     def get_name(self, card: Locator) -> str:
         return card.locator(self.NAME).inner_text().strip()
 
+    def get_href(self, card: Locator) -> str:
+        return card.locator("a").first.get_attribute("href")
+
+
     def get_current_search_settings(self) -> Tuple[str, str, str]:
         self.wait_for_search_parameters(f"{self.SEARCH_LOCATION} div")
         location = (self.locator(f"{self.SEARCH_LOCATION} div").inner_text())
@@ -72,6 +75,5 @@ class SearchResultsPage(BasePage):
             if text:
                 return
             time.sleep(poll_interval)
-
         raise TimeoutError
 
