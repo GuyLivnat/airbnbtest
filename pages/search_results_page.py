@@ -4,14 +4,11 @@ from .base_page import BasePage
 
 
 class SearchResultsPage(BasePage):
-    FILTER_DEST = 'button[aria-label*="location"]'
-    FILTER_DATES = 'button[aria-label*="dates"]'
-    FILTER_GUESTS = 'button[aria-label*="guests"]'
     CARD = 'div[data-testid="card-container"]'
-    RATING = '[aria-label$="rating"]'
     PRICE = 'div[data-testid="price-availability-row"]'
     TITLE = 'div[data-testid="listing-card-title"]'
     NAME = 'span[data-testid="listing-card-name"]'
+    NEXT_BUTTON = 'a[aria-label="Next"]'
 
     def wait_for_listings(self, timeout: int = 10000):
         # ensure at least one card appears
@@ -25,26 +22,31 @@ class SearchResultsPage(BasePage):
         self.wait_for_listings()
         return self.locator(self.CARD).first
 
-    def get_destination_filter_text(self) -> str:
-        return self.get_text(self.FILTER_DEST)
+    def click_next_page(self) -> bool:
+        next_btn = self.page.query_selector(self.NEXT_BUTTON)
 
-    def get_dates_filter_text(self) -> str:
-        return self.get_text(self.FILTER_DATES)
+        if not next_btn:
+            return False
 
-    def get_guests_filter_text(self) -> str:
-        return self.get_text(self.FILTER_GUESTS)
+        next_btn.click()
+        self.wait_for_listings()
+        return True
 
-    def get_rating(self, card: Locator) -> float:
-        deepest = card.locator(
-            "xpath=./div[last()]/div[last()]/div[last()]"
-        )
-        text = deepest.locator("span").first.inner_text()[:2]
+    @staticmethod
+    def get_rating(card: Locator) -> float:
+        deepest = card.locator("xpath=./div[last()]/div[last()]/div[last()]")  # Why did they hide this with no ID?
+        spans = deepest.locator("span")
 
-        return float(text)
+        if spans.count() == 0:  # no <span> means no rating
+            return 0.0
+        text = deepest.locator("span").first.inner_text()
+        if "new" in text.lower():
+            return 0.0
+        return float(text[:2])
 
     def get_price(self, card: Locator) -> int:
-        text = (card.locator(self.PRICE).locator('button').locator('span').first.inner_text())
-        for string in ['\u20aa', ' ', ',', 'total']:
+        text = (card.locator(f"{self.PRICE} button span").first.inner_text())
+        for string in ['\u20aa', ' ', ',', 'total']:  # \u20aa is the NIS sign
             text = text.replace(string, '')
         return int(text)
 

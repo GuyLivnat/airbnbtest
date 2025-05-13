@@ -1,15 +1,14 @@
-import pytest
 from datetime import date, timedelta
 from pages.home_page import HomePage
 from pages.search_results_page import SearchResultsPage
-from utils.helpers import find_cheapest_listing, find_highest_rated_listing
+from utils.helpers import collect_all_listings_data, get_cheapest_entry, get_highest_rated_entry, print_listing
 
 
 def test_search_nearest_weekend(page):
     search_address = "Tel Aviv"
     home = HomePage(page)
 
-    # Calculate nearest Friday and Saturday
+    # Calculate nearest Thursday and Saturday
     today = date.today()
     thursday_offset = (3 - today.weekday() + 7) % 7 or 7
     saturday_offset = (5 - today.weekday() + 7) % 7 or 7
@@ -23,23 +22,21 @@ def test_search_nearest_weekend(page):
     home.select_guests(adults=2)
     home.submit_search()
 
+    # Validate output
     results = SearchResultsPage(page)
     cards = results.get_all_listings()
     assert cards is not None, "Expected at least one listing card"
 
-    title = results.get_title(cards[0])
+    # Parse data into a dict for local use
+    data = collect_all_listings_data(results)
 
-    _, price, title, name = find_cheapest_listing(results)
-    print(f"The cheapest airbnb found for {search_address} is:\n"
-          f"Title: {title}.\n"
-          f"Name: {name}.\n"
-          f"Price: {price}\n")
+    # Print output
+    print(f"Below results are from the date {checkin_date} until {checkout_date}\n")
 
-    _, rating, title, name = find_highest_rated_listing(results)
-    print(f"The highest rated airbnb found for {search_address} is:\n"
-          f"Title: {title}.\n"
-          f"Name: {name}.\n"
-          f"Rating: {rating}\n")
+    cheapest = get_cheapest_entry(data)
+    print(f"The cheapest airbnb found for '{search_address}' is:\n\n")
+    print_listing(cheapest)
 
-    # assert rating >= 0, "Invalid rating"
-    # assert price >= 0, "Invalid price"
+    highest_rated = get_highest_rated_entry(data)
+    print(f"The highest rated airbnb found for '{search_address}' is:\n\n")
+    print_listing(highest_rated)
